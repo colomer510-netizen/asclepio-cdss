@@ -1,0 +1,25 @@
+Business Source License 1.1
+Parameters:
+Licensor: Enoc Colomer
+Licensed Work: Plataforma CDSS — Inteligencia Artificial Médica y Monitoreo IoMT
+Change Date: 2030-10-20
+Change License: GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later)
+Additional Use Grant:
+You may use the Licensed Work for educational, research, non-commercial evaluation, and personal testing purposes. You may inspect, modify, and contribute to the code repository.
+Commercial Use Restriction:
+You may NOT use the Licensed Work in or for any production environment, commercial service, hosted cloud offering (SaaS), hospital deployment charging fees, or direct revenue-generating activity without a separate commercial license granted directly in writing by the Licensor.
+
+================================================================================
+TERMS AND CONDITIONS
+
+1. Grant of License.
+Subject to the terms and conditions of this License, the Licensor hereby grants you a non-exclusive, worldwide, royalty-free copyright license to make, use, copy, modify, and distribute the Licensed Work solely for the purposes permitted by the Additional Use Grant.
+
+2. Commercial Restriction.
+Any use of the Licensed Work beyond the Additional Use Grant requires a commercial license agreement directly with the Licensor. If you wish to use this software in commercial or paid clinical settings, contact the author.
+
+3. Change Date and Change License.
+On the Change Date specified above, this License shall automatically convert into the Change License (AGPL-3.0-or-later), and your use of the Licensed Work thereafter shall be governed exclusively by the terms of the Change License.
+
+4. Disclaimer of Warranty & Limitation of Liability.
+THE LICENSED WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE LICENSED WORK OR THE USE OR OTHER DEALINGS IN THE LICENSED WORK.

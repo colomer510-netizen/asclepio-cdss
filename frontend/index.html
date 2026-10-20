@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma CDSS - Panel Clínico de Soporte y Validación</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --accent-blue: #3b82f6;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-primary); color: var(--text-main); padding: 20px; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 25px; }
+        header h1 { font-size: 1.4rem; color: var(--accent-blue); }
+        .badge-role { background: #334155; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; color: var(--accent-emerald); font-weight: bold; }
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background-color: var(--bg-secondary); border-radius: 10px; padding: 20px; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .card h2 { font-size: 1.1rem; margin-bottom: 15px; color: var(--text-main); border-bottom: 2px solid var(--accent-blue); padding-bottom: 8px; }
+        label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; }
+        input, textarea, select { width: 100%; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: white; padding: 10px; margin-bottom: 15px; font-size: 0.95rem; }
+        textarea { resize: vertical; height: 110px; }
+        button { background-color: var(--accent-blue); color: white; border: none; border-radius: 6px; padding: 12px 20px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.2s; }
+        button:hover { background-color: #2563eb; }
+        button.btn-sign { background-color: var(--accent-emerald); }
+        button.btn-sign:hover { background-color: #059669; }
+        .alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--accent-red); padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9rem; }
+        .citation-item { background: #0f172a; border-left: 3px solid var(--accent-blue); padding: 10px; margin-bottom: 10px; font-size: 0.85rem; }
+        .disclaimer { background: rgba(245, 158, 11, 0.1); border: 1px solid var(--accent-amber); padding: 10px; border-radius: 6px; font-size: 0.8rem; color: #fde68a; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Plataforma CDSS — Asistencia Clínica e Investigación</h1>
+        <div class="badge-role">Rol Activo: Médico Especialista / Staff Autorizado</div>
+    </header>
+
+    <div class="grid-container">
+        <!-- Panel Izquierdo: Ingreso de Caso y Consulta a IA -->
+        <div class="card">
+            <h2>1. Cuadro Clínico y Solicitud de Soporte IA</h2>
+            <label for="patientId">UUID del Paciente</label>
+            <input type="text" id="patientId" placeholder="Ej: 8c69405-e321-4f11-9a22-123456789abc">
+
+            <label for="staffId">UUID del Profesional Solicitante</label>
+            <input type="text" id="staffId" placeholder="Ej: 1a2b3c4d-5e6f-7a8b-9c0d-123456789abc">
+
+            <label for="clinicalNotes">Síntomas, Signos Vitales y Notas de Evolución</label>
+            <textarea id="clinicalNotes" placeholder="Describa el cuadro clínico del paciente, hallazgos de exploración física y dudas diagnósticas..."></textarea>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                    <label for="synthDrugs">Fármacos Sintéticos (Nuevos)</label>
+                    <input type="text" id="synthDrugs" placeholder="Ej: Warfarina, Metformina">
+                </div>
+                <div>
+                    <label for="naturalRemedies">Remedios Naturales / Fitoterapia</label>
+                    <input type="text" id="naturalRemedies" placeholder="Ej: Ginkgo biloba, Valeriana">
+                </div>
+            </div>
+
+            <button onclick="triggerAIConsultation()">Consultar Base Híbrida y Generar Asistencia IA</button>
+        </div>
+
+        <!-- Panel Derecho: Reporte de IA, Citas de Libros y Validación Humana -->
+        <div class="card">
+            <h2>2. Reporte Diagnóstico y Citas Bibliográficas (RAG)</h2>
+            <div id="aiResponseContainer" style="max-height: 480px; overflow-y: auto; padding-right: 5px;">
+                <p style="color: var(--text-muted); text-align: center; margin-top: 40px;">Esperando consulta clínica para procesar telemetría de máquinas y literatura...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección Inferior: Dictamen y Firma del Factor Humano -->
+    <div class="card" style="margin-top: 20px;">
+        <h2>3. Dictamen y Firma del Factor Humano (Responsabilidad Legal)</h2>
+        <div class="alert-box">
+            <strong>ADVERTENCIA LEGAL:</strong> La IA es estrictamente un asistente consultivo. El expediente oficial solo se actualizará y cerrará tras la validación, modificación y firma digital del profesional en salud responsable.
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div>
+                <label for="resolutionStatus">Dictamen Profesional</label>
+                <select id="resolutionStatus">
+                    <option value="aprobado_sin_cambios">Aprobado sin cambios</option>
+                    <option value="aprobado_con_modificaciones">Aprobado con modificaciones clínicas</option>
+                    <option value="rechazado_criterio_medico">Rechazado por criterio médico</option>
+                    <option value="escalado_a_especialista_capital">Escalado a especialista en capital</option>
+                </select>
+
+                <label for="finalDiagnosis">Diagnóstico Clínico Definitivo (En Firme)</label>
+                <input type="text" id="finalDiagnosis" placeholder="Diagnóstico validado por el facultativo">
+            </div>
+            <div>
+                <label for="finalTreatment">Plan de Curación y Tratamiento Definitivo</label>
+                <textarea id="finalTreatment" style="height: 80px;" placeholder="Plan terapéutico o quirúrgico autorizado..."></textarea>
+
+                <label for="staffPassphrase">Token o Clave Privada de Firma Digital</label>
+                <input type="password" id="staffPassphrase" placeholder="Credencial de firma del médico/enfermero">
+            </div>
+        </div>
+
+        <label for="clinicalJustification">Justificación Clínica del Profesional (Motivo de aceptación o corrección a la IA)</label>
+        <textarea id="clinicalJustification" style="height: 60px;" placeholder="Explique por qué se acepta o modifica la sugerencia algorítmica..."></textarea>
+
+        <button class="btn-sign" onclick="submitHumanDecision()">Registrar y Firmar Decisión en Expediente Oficial</button>
+        <div id="decisionResult" style="margin-top: 10px; font-weight: bold; font-size: 0.9rem;"></div>
+    </div>
+
+    <script>
+        let currentConsultationId = null;
+
+        async function triggerAIConsultation() {
+            const patientId = document.getElementById('patientId').value.trim();
+            const staffId = document.getElementById('staffId').value.trim();
+            const notes = document.getElementById('clinicalNotes').value.trim();
+            const synth = document.getElementById('synthDrugs').value.split(',').map(s => s.trim()).filter(Boolean);
+            const natural = document.getElementById('naturalRemedies').value.split(',').map(s => s.trim()).filter(Boolean);
+
+            if (!patientId || !staffId || !notes) {
+                alert("Por favor complete los campos obligatorios de Paciente, Profesional y Notas Clínicas.");
+                return;
+            }
+
+            document.getElementById('aiResponseContainer').innerHTML = "<p style='color: var(--accent-blue); text-align:center;'>Procesando búsqueda semántica pgvector, cruzando máquinas HL7 y consultando modelo IA...</p>";
+
+            try {
+                const response = await fetch('/api/v1/consultations/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        patient_id: patientId,
+                        requesting_staff_id: staffId,
+                        symptoms_and_clinical_notes: notes,
+                        proposed_synthetic_drugs: synth,
+                        proposed_natural_remedies: natural
+                    })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.detail || "Error en el servidor CDSS.");
+                }
+
+                const data = await response.json();
+                currentConsultationId = data.consultation_id;
+                renderAIReport(data.ai_assistance_report);
+
+            } catch (error) {
+                document.getElementById('aiResponseContainer').innerHTML = `<p style="color: var(--accent-red);">Error: ${error.message}</p>`;
+            }
+        }
+
+        function renderAIReport(report) {
+            let html = `<p><strong>Síntesis Clínica:</strong> ${report.clinical_summary}</p><br>`;
+            
+            html += `<strong>Diagnósticos Diferenciales Sugeridos:</strong><ul>`;
+            report.differential_diagnoses.forEach(d => {
+                html += `<li><strong>${d.pathology_name}</strong> (${d.probability_level}): ${d.reasoning}</li>`;
+            });
+            html += `</ul><br>`;
+
+            html += `<strong>Evidencia Bibliográfica Citada (RAG):</strong>`;
+            report.cited_literature.forEach(c => {
+                html += `<div class="citation-item">
+                    📖 <strong>${c.book_title}</strong> [Rama: ${c.branch}]<br>
+                    📍 Ref: ${c.page_and_section}<br>
+                    💬 ${c.clinical_relevance}
+                </div>`;
+            });
+
+            if (report.pharmacological_warnings && report.pharmacological_warnings.length > 0) {
+                html += `<div class="alert-box" style="margin-top:10px;"><strong>⚠️ Alertas Farmacológicas / Naturales:</strong>`;
+                report.pharmacological_warnings.forEach(w => {
+                    html += `<br>- [${w.severity.toUpperCase()}] ${w.compounds_involved}: ${w.action_required}`;
+                });
+                html += `</div>`;
+            }
+
+            html += `<div class="disclaimer">${report.human_governance_disclaimer}</div>`;
+            document.getElementById('aiResponseContainer').innerHTML = html;
+        }
+
+        async function submitHumanDecision() {
+            if (!currentConsultationId) {
+                alert("Debe generar y revisar una consulta de asistencia IA antes de firmar.");
+                return;
+            }
+
+            const payload = {
+                consultation_id: currentConsultationId,
+                patient_id: document.getElementById('patientId').value.trim(),
+                deciding_staff_id: document.getElementById('staffId').value.trim(),
+                resolution_status: document.getElementById('resolutionStatus').value,
+                final_clinical_diagnosis: document.getElementById('finalDiagnosis').value.trim(),
+                final_treatment_and_curation_plan: document.getElementById('finalTreatment').value.trim(),
+                clinical_justification: document.getElementById('clinicalJustification').value.trim(),
+                staff_passphrase_or_token: document.getElementById('staffPassphrase').value.trim()
+            };
+
+            try {
+                const response = await fetch('/api/v1/decisions/validate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail || "Error al registrar la decisión.");
+
+                document.getElementById('decisionResult').innerHTML = 
+                    `<span style="color: var(--accent-emerald);">✔ Éxito: Decisión firmada e inmutada (ID: ${data.decision_id})</span>`;
+            } catch (error) {
+                document.getElementById('decisionResult').innerHTML = 
+                    `<span style="color: var(--accent-red);">✖ Error: ${error.message}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: ankane/pgvector:v0.6.0
+    container_name: hospital_postgres_cdss
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: hospital_cdss
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init_schema.sql:/docker-entrypoint-initdb.d/01_init.sql
+    restart: unless-stopped
+
+  ollama-ai:
+    image: ollama/ollama:latest
+    container_name: hospital_ollama_engine
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
+  backend-cdss:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: hospital_backend_api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres-db:5432/hospital_cdss
+      - LLM_API_URL=http://ollama-ai:11434/api/chat
+      - LLM_MODEL_NAME=qwen2.5:14b
+    depends_on:
+      - postgres-db
+      - ollama-ai
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  ollama_data:
