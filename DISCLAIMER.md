@@ -1,7 +1,7 @@
 # DESCARGO DE RESPONSABILIDAD MÉDICO-LEGAL (LEGAL & CLINICAL DISCLAIMER)
 
 **Fecha de entrada en vigor:** 20 de Octubre de 2026  
-**Software:** Plataforma CDSS — Inteligencia Artificial Médica y Monitoreo IoMT
+**Software:** Asclepio CDSS — Inteligencia Artificial Médica y Monitoreo IoMT
 
 ---
 

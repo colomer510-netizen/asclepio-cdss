@@ -12,7 +12,7 @@ except ImportError:
     fitz = None
 
 EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME", "paraphrase-multilingual-mpnet-base-v2")
-DB_DSN = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5432/hospital_cdss")
+DB_DSN = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5432/asclepio_cdss")
 
 
 class MedicalLiteratureIngestor:

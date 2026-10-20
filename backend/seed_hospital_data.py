@@ -2,7 +2,7 @@ import os
 import asyncio
 import asyncpg
 
-DB_DSN = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5432/hospital_cdss")
+DB_DSN = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5432/asclepio_cdss")
 
 async def seed_database():
     print(f"[*] Conectando a PostgreSQL ({DB_DSN}) para insertar datos iniciales de prueba...")

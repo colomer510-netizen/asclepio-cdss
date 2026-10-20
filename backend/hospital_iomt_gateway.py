@@ -8,7 +8,7 @@ import asyncpg
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
 
-DB_DSN = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5432/hospital_cdss")
+DB_DSN = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5432/asclepio_cdss")
 
 iomt_app = FastAPI(
     title="Gateway IoMT - Hospitales y Maquinaria de Laboratorio",

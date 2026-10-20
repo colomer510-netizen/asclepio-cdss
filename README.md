@@ -1,4 +1,4 @@
-# Plataforma CDSS — Inteligencia Artificial Médica y Monitoreo IoMT
+# Asclepio CDSS — Inteligencia Artificial Médica y Monitoreo IoMT
 
 Sistema de Soporte a la Decisión Clínica (CDSS) distribuido de alta capacidad, diseñado para integrar bibliotecas médicas híbridas (medicina convencional alopática y fitoterapia/medicina natural basada en evidencia), telemetría hospitalaria en tiempo real (HL7 FHIR / DICOM) y un estricto protocolo de gobernanza con **factor humano obligatorio (*Human-in-the-Loop*)**.
 
@@ -19,7 +19,7 @@ El ecosistema se organiza en 5 capas tecnológicas para garantizar máxima veloc
 ## 📂 Estructura del Repositorio
 
 ```text
-hospital-cdss-platform/
+asclepio-cdss/
 ├── backend/
 │   ├── main.py                  # Servidor central FastAPI (endpoints de análisis y firma)
 │   ├── hospital_iomt_gateway.py # Receptor de tramas de máquinas HL7 FHIR y DICOM
@@ -51,8 +51,8 @@ hospital-cdss-platform/
 
 ### 1. Clonar el repositorio
 ```bash
-git clone https://github.com/encob-business/hospital-cdss-platform.git
-cd hospital-cdss-platform
+git clone https://github.com/encob-business/asclepio-cdss.git
+cd asclepio-cdss
 ```
 
 ### 2. Levantar la infraestructura completa
@@ -79,7 +79,7 @@ Este software cumple con el estándar de **Subordinación Total al Criterio Clí
 - **Trazabilidad Forense:** Toda recomendación cita la página y el capítulo del libro de donde provino la información.
 - **Firma Criptográfica:** El expediente médico solo se valida cuando el profesional registra su dictamen firmado mediante hash SHA-256.
 
-Consulte [`DISCLAIMER.md`](file:///home/enoc-colomer/dev/work/hospital-cdss-platform/DISCLAIMER.md) para el aviso médico-legal completo.
+Consulte [`DISCLAIMER.md`](file:///home/enoc-colomer/dev/work/asclepio-cdss/DISCLAIMER.md) para el aviso médico-legal completo.
 
 ---
 
@@ -88,4 +88,4 @@ Consulte [`DISCLAIMER.md`](file:///home/enoc-colomer/dev/work/hospital-cdss-plat
 Este proyecto está publicado bajo los términos de la **Business Source License 1.1 (BUSL)**.
 - **Permitido:** Uso académico, investigación, evaluación técnica y contribución de código abierta para desarrolladores.
 - **Restringido:** Uso comercial directo, despliegues lucrativos o servicios SaaS en la nube sin una licencia comercial previa otorgada por el autor ([Enoc Colomer](mailto:enoc@colomer.dev)).
-- En la fecha límite especificada en el archivo [`LICENSE`](file:///home/enoc-colomer/dev/work/hospital-cdss-platform/LICENSE), este código se convertirá automáticamente en software libre bajo la **GNU AGPLv3**.
+- En la fecha límite especificada en el archivo [`LICENSE`](file:///home/enoc-colomer/dev/work/asclepio-cdss/LICENSE), este código se convertirá automáticamente en software libre bajo la **GNU AGPLv3**.

@@ -3,11 +3,11 @@ version: '3.8'
 services:
   postgres-db:
     image: pgvector/pgvector:pg16
-    container_name: hospital_postgres_cdss
+    container_name: asclepio_postgres_cdss
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: hospital_cdss
+      POSTGRES_DB: asclepio_cdss
     ports:
       - "5433:5432"
     volumes:
@@ -17,7 +17,7 @@ services:
 
   ollama-ai:
     image: ollama/ollama:latest
-    container_name: hospital_ollama_engine
+    container_name: asclepio_ollama_engine
     ports:
       - "11434:11434"
     volumes:
@@ -28,11 +28,11 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: hospital_backend_api
+    container_name: asclepio_backend_api
     ports:
       - "8080:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:password@postgres-db:5432/hospital_cdss
+      - DATABASE_URL=postgresql://postgres:password@postgres-db:5432/asclepio_cdss
       - LLM_API_URL=http://localhost:11434/api/chat
       - LLM_MODEL_NAME=phi4-mini:latest
     extra_hosts:

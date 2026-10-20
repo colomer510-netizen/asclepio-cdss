@@ -18,7 +18,7 @@ from clinical_prompt_spec import AIClinicalOutputSchema, CLINICAL_SYSTEM_PROMPT
 from clinical_guardrails import MedicalAIGuardrail, ClinicalSafetyViolationError
 
 # Configuración de entorno
-DB_DSN = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5432/hospital_cdss")
+DB_DSN = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5432/asclepio_cdss")
 LLM_API_URL = os.getenv("LLM_API_URL", "http://localhost:11434/api/chat")
 LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME", "llama3.2:latest")
 EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME", "paraphrase-multilingual-mpnet-base-v2")

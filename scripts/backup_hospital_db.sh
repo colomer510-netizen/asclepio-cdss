@@ -4,10 +4,10 @@
 # SCRIPT DE RESPALDO Y CIFRADO SEGURO PARA BASE DE DATOS CDSS
 # ==============================================================================
 
-DB_CONTAINER="hospital_postgres_cdss"
-DB_NAME="hospital_cdss"
+DB_CONTAINER="asclepio_postgres_cdss"
+DB_NAME="asclepio_cdss"
 DB_USER="postgres"
-BACKUP_DIR="${BACKUP_DIR:-/var/backups/hospital_cdss}"
+BACKUP_DIR="${BACKUP_DIR:-/var/backups/asclepio_cdss}"
 DATE_STAMP=$(date +"%Y%m%d_%H%M%S")
 BACKUP_FILENAME="cdss_backup_${DATE_STAMP}.sql.gz"
 ENCRYPTED_FILENAME="${BACKUP_FILENAME}.gpg"
