@@ -1,18 +1,67 @@
-# Asclepio CDSS — Inteligencia Artificial Médica y Monitoreo IoMT
+# Asclepio CDSS — Clinical Decision Support Suite & IoMT Gateway
+
+> [!IMPORTANT]
+> ### 🔬 Estado del Proyecto: Demostrador Tecnológico / Prueba de Concepto (PoC)
+> **Este repositorio constituye un prototipo funcional en fase activa de desarrollo (Technology Demonstration / Proof of Concept - PoC).**
+> Ha sido diseñado exclusivamente con propósitos de **investigación biomédica, evaluación de arquitectura técnica y demostración de capacidades** de ingeniería.
+> **No está certificado como dispositivo médico (SaMD) ni aprobado para uso en producción clínica diagnóstica o terapéutica con pacientes reales.**
+
+---
+
+[![Licencia: BUSL-1.1](https://img.shields.io/badge/Licencia-BUSL--1.1-blue.svg)](LICENSE)
+[![Python: 3.11+](https://img.shields.io/badge/Python-3.11+-brightgreen.svg)](https://www.python.org/)
+[![FastAPI: 0.115](https://img.shields.io/badge/FastAPI-0.115-teal.svg)](https://fastapi.tiangolo.com/)
+[![PostgreSQL: 16+pgvector](https://img.shields.io/badge/PostgreSQL-16%20%2B%20pgvector-blue.svg)](https://github.com/pgvector/pgvector)
+[![Security: Bandit Audited](https://img.shields.io/badge/Security-Bandit%20Clean-success.svg)](https://github.com/PyCQA/bandit)
+[![Code Style: Ruff](https://img.shields.io/badge/Code%20Style-Ruff-black.svg)](https://github.com/astral-sh/ruff)
 
 Sistema de Soporte a la Decisión Clínica (CDSS) distribuido de alta capacidad, diseñado para integrar bibliotecas médicas híbridas (medicina convencional alopática y fitoterapia/medicina natural basada en evidencia), telemetría hospitalaria en tiempo real (HL7 FHIR / DICOM) y un estricto protocolo de gobernanza con **factor humano obligatorio (*Human-in-the-Loop*)**.
 
 ---
 
-## 🏛️ Arquitectura del Sistema
+## 🏛️ Arquitectura del Sistema (Hospital OS)
 
-El ecosistema se organiza en 5 capas tecnológicas para garantizar máxima velocidad diagnóstica, soberanía de datos y seguridad legal del acto médico:
+El ecosistema se organiza en capas tecnológicas modulares para garantizar soberanía de datos, baja latencia diagnóstica y seguridad legal del acto médico:
 
-1. **Ingesta e Interoperabilidad (IoMT):** Receptor concurrentemente conectado a analizadores hematológicos, bioquímicos y monitores multiparámetro (estándares HL7 FHIR y DICOM).
-2. **Biblioteca Médica Híbrida (RAG Vectorial):** PostgreSQL con extensión `pgvector` e índice HNSW para búsqueda semántica ultrarrápida sobre literatura médica convencional y tratados de medicina natural.
-3. **Detector de Interacciones Farmacológicas Cruzadas:** Motor que cruza en tiempo real el consumo de remedios naturales frente a fármacos sintéticos para prevenir efectos adversos graves.
-4. **Motor Cognitivo y Cortafuegos de Seguridad (`clinical_guardrails.py`):** Inferencia con modelos de lenguaje locales (vía Ollama: `qwen2.5:14b` o `llama3.2`) con validación forzosa de citas (`chunk_id`, libro y página) y bloqueo determinista de cualquier tono imperativo o directivo.
-5. **Gobernanza y Responsabilidad Humana:** Tablas inmutables con *triggers* PostgreSQL donde ninguna sugerencia algorítmica ingresa al expediente sin la resolución y firma digital del médico o enfermero colegiado.
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│               ASCLEPIO CDSS — SUITE HOSPITALARIA MODULAR               │
+└────────────────────────────────────────────────────────────────────────┘
+          │                                           │
+          ▼                                           ▼
+┌─────────────────────────────┐             ┌─────────────────────────────┐
+│ 1. Estación Clínica/Triaje  │             │ 5. Vademécum & Fitoterapia  │
+│    - Diagnósticos dif. RAG  │             │    - Matriz de interacciones│
+│    - Firma médica SHA-256   │             │    - Prevención de riesgos  │
+├─────────────────────────────┤             ├─────────────────────────────┤
+│ 2. Expedientes y Pacientes  │             │ 6. Consola de IA & Modelos  │
+│    - MRN, tipos de sangre   │             │    - Modelos locales Ollama │
+│    - Historial de alergias  │             │    - Guardrails y contratos │
+├─────────────────────────────┤             ├─────────────────────────────┤
+│ 3. IoMT & Laboratorio       │             │ 7. Auditoría & Trazabilidad │
+│    - Gateway MLLP / HL7     │             │    - Ledger inmutable DB    │
+│    - Telemetría en vivo     │             │    - Verificación forense   │
+├─────────────────────────────┤             ├─────────────────────────────┤
+│ 4. Biblioteca Vectorial     │             │ 8. Métricas y Configuración │
+│    - Tratados indexados     │             │    - Estado de contenedores │
+│    - Búsqueda con pgvector  │             │    - Salud de base de datos │
+└─────────────────────────────┘             └─────────────────────────────┘
+                                  │
+                                  ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                      NÚCLEO DE INFRAESTRUCTURA                         │
+│   FastAPI (Python 3.11) ─── PostgreSQL 16 (pgvector) ─── Ollama Engine  │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🛡️ Principio Ético Fundamental: *Human-in-the-Loop*
+
+1. **Subordinación Total:** Ningún modelo de inteligencia artificial emite órdenes diagnósticas ni recetas de forma autónoma. Todas las salidas se clasifican estrictamente como *Sugerencias No Vinculantes*.
+2. **Citas Bibliográficas Obligatorias:** Cada hipótesis clínica generada por el motor RAG debe indicar explícitamente el tratado, edición, capítulo y fragmento de evidencia.
+3. **Firma Criptográfica Inmutable:** Toda acción médica requiere la autenticación activa del profesional de la salud con registro criptográfico (SHA-256) no repudiable.
+4. **Descargo Médico-Legal:** Consulte [`DISCLAIMER.md`](DISCLAIMER.md) para el marco de delimitación de responsabilidad jurídica.
 
 ---
 
@@ -21,71 +70,84 @@ El ecosistema se organiza en 5 capas tecnológicas para garantizar máxima veloc
 ```text
 asclepio-cdss/
 ├── backend/
-│   ├── main.py                  # Servidor central FastAPI (endpoints de análisis y firma)
-│   ├── hospital_iomt_gateway.py # Receptor de tramas de máquinas HL7 FHIR y DICOM
-│   ├── clinical_prompt_spec.py  # Contratos Pydantic estrictos y System Prompts clínicos
-│   ├── clinical_guardrails.py   # Cortafuegos anti-alucinación y subordinación médica
-│   ├── ingest_medical_books.py  # Procesador de libros médicos en PDF hacia pgvector
-│   ├── seed_hospital_data.py    # Inyector de datos iniciales para pruebas
+│   ├── main.py                  # API REST completa (8 módulos hospitalarios integrados)
+│   ├── hospital_iomt_gateway.py # Receptor y simulador de tramas HL7 FHIR y DICOM
+│   ├── clinical_prompt_spec.py  # Contratos Pydantic v2 y System Prompts clínicos
+│   ├── clinical_guardrails.py   # Cortafuegos anti-alucinaciones y reglas de seguridad
+│   ├── ingest_medical_books.py  # Procesador semántico de tratados hacia pgvector
+│   ├── seed_hospital_data.py    # Generador de datos clínicos para entornos demo/pruebas
 │   ├── requirements.txt         # Dependencias Python
-│   └── Dockerfile               # Contenedor del backend
+│   └── Dockerfile               # Contenedor optimizado de backend
 ├── db/
 │   ├── init_schema.sql          # DDL completo con pgvector, tipos ENUM y triggers inmutables
-│   └── queries_referencia.sql   # Consultas SQL avanzadas para RAG e interacciones
+│   └── queries_referencia.sql   # Consultas SQL optimizadas para similitud de cosenos
 ├── frontend/
-│   └── index.html               # Panel web de alta densidad para médicos y enfermeros
+│   └── index.html               # Panel Web Hospital OS moderno (8 vistas interactivas)
 ├── scripts/
 │   └── backup_hospital_db.sh    # Script de respaldo diario con cifrado AES-256 (GPG)
 ├── docs/
-│   └── MANUAL_OPERATIVO_CLINICO.md # Guía para el personal de salud
+│   └── MANUAL_OPERATIVO_CLINICO.md # Manual técnico y operativo para personal de salud
 ├── docker-compose.yml           # Orquestación con PostgreSQL (pgvector), Ollama y FastAPI
 ├── Modelfile                    # Definición de parámetros para el modelo médico en Ollama
-├── LICENSE                      # Licencia BUSL 1.1 (Protección contra explotación comercial)
+├── LICENSE                      # Licencia BUSL-1.1
 ├── DISCLAIMER.md                # Descargo médico-legal estricto ("AS-IS", no vinculante)
 └── README.md
 ```
 
 ---
 
-## 🚀 Despliegue Rápido con Docker Compose
+## 🚀 Despliegue Rápido (Entorno Local / Demo)
 
-### 1. Clonar el repositorio
+### 1. Requisitos Previos
+- Docker Engine 24.0+ y Docker Compose v2+
+- Motor local Ollama (opcional para inferencia con `phi4-mini:latest` o `llama3.2:latest`)
+- Puerto `5433` (PostgreSQL) y `8080` (FastAPI) disponibles en la máquina anfitriona
+
+### 2. Clonar el repositorio
 ```bash
-git clone https://github.com/encob-business/asclepio-cdss.git
+git clone https://github.com/colomer510-netizen/asclepio-cdss.git
 cd asclepio-cdss
 ```
 
-### 2. Levantar la infraestructura completa
+### 3. Iniciar los servicios con Docker Compose
 ```bash
-docker compose up --build -d
+docker compose up -d --build
 ```
 
-### 3. Verificar estado de los contenedores
-```bash
-docker compose ps
-```
-
-### 4. Acceder al Panel Clínico
-Abra su navegador web e ingrese a:
-- **Panel Web del Personal de Salud:** `http://localhost:8000/static/index.html`
-- **Documentación Interactiva Swagger API:** `http://localhost:8000/docs`
+### 4. Acceso a las Interfaces
+Una vez levantados los contenedores:
+- **Panel Web Hospital OS:** [http://localhost:8080/static/index.html](http://localhost:8080/static/index.html)
+- **Documentación Swagger / OpenAPI:** [http://localhost:8080/docs](http://localhost:8080/docs)
+- **Métricas del Sistema:** [http://localhost:8080/api/v1/system/metrics](http://localhost:8080/api/v1/system/metrics)
 
 ---
 
-## 🛡️ Gobernanza Legal y Factor Humano
+## 🔍 Auditoría de Calidad y Seguridad Continua
 
-Este software cumple con el estándar de **Subordinación Total al Criterio Clínico Humano**:
-- **La IA no prescribe:** Toda salida se etiqueta como *"Sugerencia de Soporte Clínico - No Vinculante"*.
-- **Trazabilidad Forense:** Toda recomendación cita la página y el capítulo del libro de donde provino la información.
-- **Firma Criptográfica:** El expediente médico solo se valida cuando el profesional registra su dictamen firmado mediante hash SHA-256.
+El proyecto se somete a auditorías automáticas de seguridad y calidad estática en cada ciclo de integración:
 
-Consulte [`DISCLAIMER.md`](file:///home/enoc-colomer/dev/work/asclepio-cdss/DISCLAIMER.md) para el aviso médico-legal completo.
+```bash
+# Auditoría de seguridad estática (SAST)
+docker exec asclepio_backend_api bandit -r /app -ll
+
+# Análisis estático de código y conformidad de tipos
+docker exec asclepio_backend_api ruff check /app
+```
+
+**Resultado de la última auditoría:** `0 issues identified` en Bandit y `0 errors` en Ruff.
 
 ---
 
 ## 📜 Licencia
 
-Este proyecto está publicado bajo los términos de la **Business Source License 1.1 (BUSL)**.
-- **Permitido:** Uso académico, investigación, evaluación técnica y contribución de código abierta para desarrolladores.
-- **Restringido:** Uso comercial directo, despliegues lucrativos o servicios SaaS en la nube sin una licencia comercial previa otorgada por el autor ([Enoc Colomer](mailto:enoc@colomer.dev)).
-- En la fecha límite especificada en el archivo [`LICENSE`](file:///home/enoc-colomer/dev/work/asclepio-cdss/LICENSE), este código se convertirá automáticamente en software libre bajo la **GNU AGPLv3**.
+Este proyecto está publicado bajo los términos de la **Business Source License 1.1 (BUSL-1.1)**.
+- **Permitido:** Uso académico, investigación, evaluación técnica y auditorías de código abierto.
+- **Restringido:** Explotación comercial, venta directa o provisión de servicios SaaS en la nube sin autorización previa por escrito del autor.
+- Cumplido el plazo de transición indicado en [`LICENSE`](LICENSE), el código transicionará automáticamente a licencia **GNU AGPLv3**.
+
+---
+
+<p align="center">
+  <b>Desarrollado y mantenido por Enoc Colomer</b><br>
+  <i>Investigación y Desarrollo en Sistemas de Decisión Clínica e Inteligencia Artificial Médica</i>
+</p>
