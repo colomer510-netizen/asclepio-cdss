@@ -18,7 +18,7 @@ async def seed_database():
                 ON CONFLICT (license_number) DO UPDATE SET full_name = EXCLUDED.full_name
                 RETURNING staff_id;
                 """,
-                "Dr. Carlos Mendoza", "MINSA-MED-99421", "especialista", "Hospital Central Capital", "sha256_mock_public_key_carlos"
+                "Dr. Carlos Mendoza", "MINSA-MED-99421", "especialista", "Medicina Interna", "Hospital Central Capital", "sha256_mock_public_key_carlos"
             )
             print(f"[✔] Personal médico registrado con ID: {staff_id}")
 
