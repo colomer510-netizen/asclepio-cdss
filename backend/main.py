@@ -64,10 +64,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Servir frontend estático si existe la carpeta ../frontend
-frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
-if os.path.exists(frontend_dir):
-    app.mount("/static", StaticFiles(directory=frontend_dir, html=True), name="static")
+# Servir frontend estático si existe
+frontend_candidates = [
+    os.path.join(os.path.dirname(__file__), "frontend"),
+    os.path.join(os.path.dirname(__file__), "..", "frontend"),
+    "/app/frontend",
+]
+for candidate in frontend_candidates:
+    if os.path.exists(candidate):
+        app.mount("/static", StaticFiles(directory=candidate, html=True), name="static")
+        print(f"[*] Frontend montado en /static desde: {candidate}")
+        break
 
 
 # ============================================================================
