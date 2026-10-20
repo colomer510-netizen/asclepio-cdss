@@ -1,7 +1,7 @@
-import os
 import json
-from datetime import datetime
-from typing import Any, Dict, Optional
+import os
+from datetime import UTC, datetime
+from typing import Any
 from uuid import UUID
 
 import asyncpg
@@ -16,7 +16,7 @@ iomt_app = FastAPI(
     version="1.0.0",
 )
 
-db_pool: Optional[asyncpg.Pool] = None
+db_pool: asyncpg.Pool | None = None
 
 
 @iomt_app.on_event("startup")
@@ -24,7 +24,7 @@ async def startup_event():
     global db_pool
     try:
         db_pool = await asyncpg.create_pool(DB_DSN)
-    except Exception as e:
+    except (asyncpg.PostgresError, OSError) as e:
         print(f"[!] IoMT Gateway en espera de base de datos: {e}")
 
 
@@ -42,10 +42,10 @@ class HL7ObservationPayload(BaseModel):
     patient_id: UUID
     serial_number_equipment: str = Field(..., description="Número de serie único del analizador o monitor")
     study_type: str = Field(..., description="Ej: Hemograma completo, Gases arteriales, Glucemia, Tomografía")
-    raw_fhir_observation: Dict[str, Any] = Field(..., description="Objeto JSON completo del recurso HL7 FHIR Observation")
+    raw_fhir_observation: dict[str, Any] = Field(..., description="Objeto JSON completo del recurso HL7 FHIR Observation")
     abnormal_flags: list[str] = Field(default_factory=list, description="Banderas de alerta detectadas por el equipo (ej. 'CRITICAL_HIGH')")
-    dicom_storage_uri: Optional[str] = Field(None, description="Ruta PACS o NAS si la máquina es de imagenología")
-    force_critical_alert: bool = Field(False)
+    dicom_storage_uri: str | None = Field(None, description="Ruta PACS o NAS si la máquina es de imagenología")
+    force_critical_alert: bool = Field(default=False)
 
 
 # ============================================================================
@@ -113,5 +113,5 @@ async def ingest_machine_payload(payload: HL7ObservationPayload):
         "result_id": result_id,
         "equipment_id": equipment_id,
         "critical_alert_triggered": is_critical,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }

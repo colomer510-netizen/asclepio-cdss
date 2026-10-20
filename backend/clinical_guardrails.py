@@ -1,16 +1,17 @@
 import re
+from typing import ClassVar
 from uuid import UUID
+
 from clinical_prompt_spec import AIClinicalOutputSchema
 
 
 class ClinicalSafetyViolationError(Exception):
     """Excepción disparada cuando la IA viola las reglas de subordinación humana o evidencia."""
-    pass
 
 
 class MedicalAIGuardrail:
     # Expresiones regulares que detectan órdenes imperativas o lenguaje que usurpa al médico
-    FORBIDDEN_IMPERATIVE_PATTERNS = [
+    FORBIDDEN_IMPERATIVE_PATTERNS: ClassVar[list[str]] = [
         r"\b(ordeno|prescribo|diagnostico definitivamente|administre de inmediato sin consultar)\b",
         r"\b(usted tiene|usted padece|tome este medicamento)\b",  # Dirigirse al paciente en 2da persona
         r"\b(no es necesario consultar al médico|reemplaza la valoración)\b",

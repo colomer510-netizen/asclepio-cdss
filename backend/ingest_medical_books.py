@@ -71,64 +71,63 @@ class MedicalLiteratureIngestor:
         current_chapter = "Introducción / General"
         chunks_to_insert = []
 
-        async with pool.acquire() as conn:
-            async with conn.transaction():
-                document_id: UUID = await conn.fetchval(
-                    """
-                    INSERT INTO medical_literature (
-                        title, authors, publication_year, branch, 
-                        isbn_or_doi, evidence_level, source_institution
-                    )
-                    VALUES ($1, $2, $3, $4::medicine_branch, $5, $6, $7)
-                    ON CONFLICT (isbn_or_doi) DO UPDATE SET title = EXCLUDED.title
-                    RETURNING document_id;
-                    """,
-                    title, authors, publication_year, branch,
+        async with pool.acquire() as conn, conn.transaction():
+            document_id: UUID = await conn.fetchval(
+                """
+                INSERT INTO medical_literature (
+                    title, authors, publication_year, branch, 
                     isbn_or_doi, evidence_level, source_institution
                 )
+                VALUES ($1, $2, $3, $4::medicine_branch, $5, $6, $7)
+                ON CONFLICT (isbn_or_doi) DO UPDATE SET title = EXCLUDED.title
+                RETURNING document_id;
+                """,
+                title, authors, publication_year, branch,
+                isbn_or_doi, evidence_level, source_institution
+            )
 
-                print(f"[*] Procesando '{title}' (ID: {document_id}) - {len(doc_pdf)} páginas...")
+            print(f"[*] Procesando '{title}' (ID: {document_id}) - {len(doc_pdf)} páginas...")
 
-                for page_index in range(len(doc_pdf)):
-                    page = doc_pdf[page_index]
-                    page_number = page_index + 1
-                    raw_text = page.get_text("text")
-                    
-                    current_chapter = self.detect_chapter(raw_text, current_chapter)
-                    page_chunks = self.chunk_page_text(raw_text)
+            for page_index in range(len(doc_pdf)):
+                page = doc_pdf[page_index]
+                page_number = page_index + 1
+                raw_text = page.get_text("text")
+                
+                current_chapter = self.detect_chapter(raw_text, current_chapter)
+                page_chunks = self.chunk_page_text(raw_text)
 
-                    for idx, chunk_text in enumerate(page_chunks):
-                        section_ref = f"Pág. {page_number} - Frag. {idx + 1}"
-                        chunks_to_insert.append(
-                            (document_id, current_chapter, page_number, section_ref, chunk_text)
-                        )
-
-                texts_only = [item[4] for item in chunks_to_insert]
-                print(f"[*] Generando embeddings para {len(texts_only)} fragmentos...")
-                embeddings = self.embedder.encode(texts_only, normalize_embeddings=True, show_progress_bar=True)
-
-                records_with_vectors = [
-                    (
-                        item[0],
-                        item[1],
-                        item[2],
-                        item[3],
-                        item[4],
-                        embeddings[i].tolist(),
+                for idx, chunk_text in enumerate(page_chunks):
+                    section_ref = f"Pág. {page_number} - Frag. {idx + 1}"
+                    chunks_to_insert.append(
+                        (document_id, current_chapter, page_number, section_ref, chunk_text)
                     )
-                    for i, item in enumerate(chunks_to_insert)
-                ]
 
-                await conn.executemany(
-                    """
-                    INSERT INTO literature_chunks (
-                        document_id, chapter_title, page_number, 
-                        section_reference, content_text, embedding
-                    )
-                    VALUES ($1, $2, $3, $4, $5, $6);
-                    """,
-                    records_with_vectors,
+            texts_only = [item[4] for item in chunks_to_insert]
+            print(f"[*] Generando embeddings para {len(texts_only)} fragmentos...")
+            embeddings = self.embedder.encode(texts_only, normalize_embeddings=True, show_progress_bar=True)
+
+            records_with_vectors = [
+                (
+                    item[0],
+                    item[1],
+                    item[2],
+                    item[3],
+                    item[4],
+                    embeddings[i].tolist(),
                 )
+                for i, item in enumerate(chunks_to_insert)
+            ]
+
+            await conn.executemany(
+                """
+                INSERT INTO literature_chunks (
+                    document_id, chapter_title, page_number, 
+                    section_reference, content_text, embedding
+                )
+                VALUES ($1, $2, $3, $4, $5, $6);
+                """,
+                records_with_vectors,
+            )
 
         doc_pdf.close()
         print(f"[✔] Ingesta completada con éxito: {len(records_with_vectors)} fragmentos indexados.")
@@ -137,7 +136,7 @@ class MedicalLiteratureIngestor:
 
 async def main():
     pool = await asyncpg.create_pool(DB_DSN, init=register_vector)
-    ingestor = MedicalLiteratureIngestor()
+    _ingestor = MedicalLiteratureIngestor()
     print("[✔] Ingestor de literatura médica listo.")
     await pool.close()
 

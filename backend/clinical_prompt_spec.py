@@ -1,4 +1,3 @@
-from typing import List, Optional
 from uuid import UUID
 from pydantic import BaseModel, Field
 
@@ -17,14 +16,14 @@ class DifferentialDiagnosisItem(BaseModel):
     pathology_name: str = Field(..., description="Nombre de la patología o condición sospechada")
     cie11_code_estimate: str = Field(..., description="Código CIE-11 estimado")
     probability_level: str = Field(..., description="Alta, Media o Baja")
-    supporting_biomarkers: List[str] = Field(..., description="Valores de máquinas de laboratorio (HL7/DICOM) que sustentan esta hipótesis")
+    supporting_biomarkers: list[str] = Field(..., description="Valores de máquinas de laboratorio (HL7/DICOM) que sustentan esta hipótesis")
     reasoning: str = Field(..., description="Razonamiento fisiopatológico detallado")
 
 class SuggestedTreatmentAndCuration(BaseModel):
-    conventional_approach: List[str] = Field(..., description="Opciones farmacológicas o clínicas convencionales basadas en la evidencia")
-    natural_complementary_approach: List[str] = Field(..., description="Opciones de medicina natural/fitoterapia validadas y seguras para el caso")
-    nursing_curation_protocol: List[str] = Field(..., description="Pasos técnicos de monitoreo, curación de heridas o cuidados de enfermería")
-    recommended_capital_equipment_studies: List[str] = Field(..., description="Estudios adicionales sugeridos en máquinas de laboratorio o imagenología de capitales")
+    conventional_approach: list[str] = Field(..., description="Opciones farmacológicas o clínicas convencionales basadas en la evidencia")
+    natural_complementary_approach: list[str] = Field(..., description="Opciones de medicina natural/fitoterapia validadas y seguras para el caso")
+    nursing_curation_protocol: list[str] = Field(..., description="Pasos técnicos de monitoreo, curación de heridas o cuidados de enfermería")
+    recommended_capital_equipment_studies: list[str] = Field(..., description="Estudios adicionales sugeridos en máquinas de laboratorio o imagenología de capitales")
 
 class InteractionAlert(BaseModel):
     compounds_involved: str = Field(..., description="Fármaco sintético y compuesto natural en conflicto")
@@ -33,10 +32,10 @@ class InteractionAlert(BaseModel):
 
 class AIClinicalOutputSchema(BaseModel):
     clinical_summary: str = Field(..., description="Síntesis ejecutiva del estado del paciente y hallazgos críticos de laboratorio")
-    differential_diagnoses: List[DifferentialDiagnosisItem]
+    differential_diagnoses: list[DifferentialDiagnosisItem]
     treatment_and_curation_plan: SuggestedTreatmentAndCuration
-    pharmacological_warnings: List[InteractionAlert]
-    cited_literature: List[CitedEvidence]
+    pharmacological_warnings: list[InteractionAlert]
+    cited_literature: list[CitedEvidence]
     human_governance_disclaimer: str = Field(
         default="ADVERTENCIA LEGAL Y CLÍNICA: Este análisis ha sido generado por un sistema de Inteligencia Artificial de soporte diagnóstico. NO constituye una orden médica ni reemplaza el juicio clínico. La decisión final y la responsabilidad recaen exclusivamente en el médico o enfermero firmante."
     )

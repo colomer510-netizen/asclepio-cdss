@@ -3,133 +3,911 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma CDSS - Panel Clínico de Soporte y Validación</title>
+    <title>Asclepio CDSS — Hospital OS & Clinical Decision Support Suite</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
+            --bg-base: #090d16;
+            --bg-sidebar: #0f172a;
+            --bg-card: #1e293b;
+            --bg-subtle: #151e32;
+            --border-color: #334155;
             --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
             --accent-emerald: #10b981;
             --accent-amber: #f59e0b;
-            --accent-red: #ef4444;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --accent-rose: #f43f5e;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background-color: var(--bg-primary); color: var(--text-main); padding: 20px; }
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 25px; }
-        header h1 { font-size: 1.4rem; color: var(--accent-blue); }
-        .badge-role { background: #334155; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; color: var(--accent-emerald); font-weight: bold; }
-        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .card { background-color: var(--bg-secondary); border-radius: 10px; padding: 20px; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .card h2 { font-size: 1.1rem; margin-bottom: 15px; color: var(--text-main); border-bottom: 2px solid var(--accent-blue); padding-bottom: 8px; }
-        label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; }
-        input, textarea, select { width: 100%; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: white; padding: 10px; margin-bottom: 15px; font-size: 0.95rem; }
-        textarea { resize: vertical; height: 110px; }
-        button { background-color: var(--accent-blue); color: white; border: none; border-radius: 6px; padding: 12px 20px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.2s; }
-        button:hover { background-color: #2563eb; }
-        button.btn-sign { background-color: var(--accent-emerald); }
-        button.btn-sign:hover { background-color: #059669; }
-        .alert-box { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--accent-red); padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9rem; }
-        .citation-item { background: #0f172a; border-left: 3px solid var(--accent-blue); padding: 10px; margin-bottom: 10px; font-size: 0.85rem; }
-        .disclaimer { background: rgba(245, 158, 11, 0.1); border: 1px solid var(--accent-amber); padding: 10px; border-radius: 6px; font-size: 0.8rem; color: #fde68a; margin-top: 15px; }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-base); color: var(--text-primary); display: flex; height: 100vh; overflow: hidden; }
+
+        /* SIDEBAR NAVIGATION */
+        aside.sidebar {
+            width: 280px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .brand-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-logo {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .brand-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #fff;
+        }
+
+        .brand-subtitle {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav.menu-list {
+            padding: 15px 10px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            user-select: none;
+        }
+
+        .nav-item i { width: 18px; text-align: center; font-size: 1rem; }
+        .nav-item:hover { background-color: var(--bg-subtle); color: #fff; }
+        .nav-item.active { background: linear-gradient(90deg, #1e3a8a, var(--bg-card)); color: var(--accent-cyan); font-weight: 600; border-left: 3px solid var(--accent-cyan); }
+
+        .system-pill {
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-emerald);
+            box-shadow: 0 0 8px var(--accent-emerald);
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* MAIN CONTENT AREA */
+        main.main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: var(--bg-base);
+        }
+
+        header.topbar {
+            height: 60px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--bg-sidebar);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 15px; font-size: 0.95rem; font-weight: 600; }
+        .topbar-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 0.75rem; }
+
+        .content-scroll {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .view-panel { display: none; }
+        .view-panel.active { display: block; }
+
+        /* COMMON UI COMPONENTS */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .card-title { font-size: 1rem; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+        label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, textarea, select {
+            width: 100%;
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: #fff;
+            padding: 9px 12px;
+            margin-bottom: 14px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent-blue); }
+
+        .btn {
+            background: var(--accent-blue);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn-emerald { background: var(--accent-emerald); }
+        .btn-amber { background: var(--accent-amber); color: #000; }
+        .btn-rose { background: var(--accent-rose); }
+        .btn-block { width: 100%; }
+
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+        table.data-table th {
+            background-color: var(--bg-subtle);
+            color: var(--text-secondary);
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+        table.data-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+            color: #e2e8f0;
+        }
+        table.data-table tr:hover { background-color: rgba(255,255,255,0.02); }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .tag-emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .tag-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .tag-rose { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
+        .tag-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+
+        .stat-box {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background-color: var(--bg-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+        .stat-value { font-size: 1.4rem; font-weight: 700; color: #fff; }
+        .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; }
+
+        .citation-item {
+            background: var(--bg-base);
+            border-left: 3px solid var(--accent-cyan);
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.85rem;
+        }
+
+        .alert-box {
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid var(--accent-rose);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+            font-size: 0.85rem;
+        }
+
+        .disclaimer-box {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid var(--accent-amber);
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            color: #fde68a;
+            margin-top: 14px;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Plataforma CDSS — Asistencia Clínica e Investigación</h1>
-        <div class="badge-role">Rol Activo: Médico Especialista / Staff Autorizado</div>
-    </header>
-
-    <div class="grid-container">
-        <!-- Panel Izquierdo: Ingreso de Caso y Consulta a IA -->
-        <div class="card">
-            <h2>1. Cuadro Clínico y Solicitud de Soporte IA</h2>
-            <label for="patientId">UUID del Paciente</label>
-            <input type="text" id="patientId" placeholder="Ej: 8c69405-e321-4f11-9a22-123456789abc">
-
-            <label for="staffId">UUID del Profesional Solicitante</label>
-            <input type="text" id="staffId" placeholder="Ej: 1a2b3c4d-5e6f-7a8b-9c0d-123456789abc">
-
-            <label for="clinicalNotes">Síntomas, Signos Vitales y Notas de Evolución</label>
-            <textarea id="clinicalNotes" placeholder="Describa el cuadro clínico del paciente, hallazgos de exploración física y dudas diagnósticas..."></textarea>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div>
-                    <label for="synthDrugs">Fármacos Sintéticos (Nuevos)</label>
-                    <input type="text" id="synthDrugs" placeholder="Ej: Warfarina, Metformina">
-                </div>
-                <div>
-                    <label for="naturalRemedies">Remedios Naturales / Fitoterapia</label>
-                    <input type="text" id="naturalRemedies" placeholder="Ej: Ginkgo biloba, Valeriana">
-                </div>
-            </div>
-
-            <button onclick="triggerAIConsultation()">Consultar Base Híbrida y Generar Asistencia IA</button>
-        </div>
-
-        <!-- Panel Derecho: Reporte de IA, Citas de Libros y Validación Humana -->
-        <div class="card">
-            <h2>2. Reporte Diagnóstico y Citas Bibliográficas (RAG)</h2>
-            <div id="aiResponseContainer" style="max-height: 480px; overflow-y: auto; padding-right: 5px;">
-                <p style="color: var(--text-muted); text-align: center; margin-top: 40px;">Esperando consulta clínica para procesar telemetría de máquinas y literatura...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sección Inferior: Dictamen y Firma del Factor Humano -->
-    <div class="card" style="margin-top: 20px;">
-        <h2>3. Dictamen y Firma del Factor Humano (Responsabilidad Legal)</h2>
-        <div class="alert-box">
-            <strong>ADVERTENCIA LEGAL:</strong> La IA es estrictamente un asistente consultivo. El expediente oficial solo se actualizará y cerrará tras la validación, modificación y firma digital del profesional en salud responsable.
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+    <!-- BARRA LATERAL CON LAS 8 MÓDULOS DEL HOSPITAL OS -->
+    <aside class="sidebar">
+        <div class="brand-header">
+            <div class="brand-logo"><i class="fa-solid fa-staff-snake"></i></div>
             <div>
-                <label for="resolutionStatus">Dictamen Profesional</label>
-                <select id="resolutionStatus">
-                    <option value="aprobado_sin_cambios">Aprobado sin cambios</option>
-                    <option value="aprobado_con_modificaciones">Aprobado con modificaciones clínicas</option>
-                    <option value="rechazado_criterio_medico">Rechazado por criterio médico</option>
-                    <option value="escalado_a_especialista_capital">Escalado a especialista en capital</option>
-                </select>
-
-                <label for="finalDiagnosis">Diagnóstico Clínico Definitivo (En Firme)</label>
-                <input type="text" id="finalDiagnosis" placeholder="Diagnóstico validado por el facultativo">
-            </div>
-            <div>
-                <label for="finalTreatment">Plan de Curación y Tratamiento Definitivo</label>
-                <textarea id="finalTreatment" style="height: 80px;" placeholder="Plan terapéutico o quirúrgico autorizado..."></textarea>
-
-                <label for="staffPassphrase">Token o Clave Privada de Firma Digital</label>
-                <input type="password" id="staffPassphrase" placeholder="Credencial de firma del médico/enfermero">
+                <div class="brand-title">ASCLEPIO CDSS</div>
+                <div class="brand-subtitle">Clinical Decision Support</div>
             </div>
         </div>
 
-        <label for="clinicalJustification">Justificación Clínica del Profesional (Motivo de aceptación o corrección a la IA)</label>
-        <textarea id="clinicalJustification" style="height: 60px;" placeholder="Explique por qué se acepta o modifica la sugerencia algorítmica..."></textarea>
+        <nav class="menu-list">
+            <div class="nav-item active" onclick="switchView('clinical-station')">
+                <i class="fa-solid fa-stethoscope"></i>
+                <span>Estación Clínica & Triaje</span>
+            </div>
+            <div class="nav-item" onclick="switchView('patients-records')">
+                <i class="fa-solid fa-id-card-clip"></i>
+                <span>Expedientes & Pacientes</span>
+            </div>
+            <div class="nav-item" onclick="switchView('iomt-lab')">
+                <i class="fa-solid fa-heart-pulse"></i>
+                <span>IoMT & Laboratorio</span>
+            </div>
+            <div class="nav-item" onclick="switchView('rag-library')">
+                <i class="fa-solid fa-book-medical"></i>
+                <span>Biblioteca RAG Vectorial</span>
+            </div>
+            <div class="nav-item" onclick="switchView('pharmacology-botany')">
+                <i class="fa-solid fa-capsules"></i>
+                <span>Vademécum & Fitoterapia</span>
+            </div>
+            <div class="nav-item" onclick="switchView('ai-governance')">
+                <i class="fa-solid fa-brain"></i>
+                <span>Consola de IA & Modelos</span>
+            </div>
+            <div class="nav-item" onclick="switchView('audit-ledger')">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Auditoría & Trazabilidad</span>
+            </div>
+            <div class="nav-item" onclick="switchView('system-metrics')">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Métricas & Configuración</span>
+            </div>
+        </nav>
 
-        <button class="btn-sign" onclick="submitHumanDecision()">Registrar y Firmar Decisión en Expediente Oficial</button>
-        <div id="decisionResult" style="margin-top: 10px; font-weight: bold; font-size: 0.9rem;"></div>
-    </div>
+        <div class="system-pill">
+            <div><span class="status-dot"></span><span>SISTEMA NOMINAL</span></div>
+            <span style="color: var(--accent-cyan);">v2.0.0</span>
+        </div>
+    </aside>
+
+    <!-- ÁREA DE CONTENIDO DINÁMICO -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <span id="currentViewTitle">Estación Clínica & Triaje Asistido</span>
+                <span class="topbar-badge">Human-in-the-Loop Mandatorio</span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 15px;">
+                <span id="dbConnectionPill"><i class="fa-solid fa-database" style="color: var(--accent-emerald);"></i> PostgreSQL Vector: Conectado</span>
+                <span><i class="fa-solid fa-user-doctor"></i> Dr. Enoc Colomer (Médico Titular)</span>
+            </div>
+        </header>
+
+        <div class="content-scroll">
+
+            <!-- 1. ESTACIÓN CLÍNICA Y TRIAJE (CONSULTAS RAG + FIRMA HUMANA) -->
+            <div id="clinical-station" class="view-panel active">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa-solid fa-file-medical"></i> Cuadro Clínico y Entrada de Consulta</div>
+                            <span class="tag tag-blue">Fase 1: Asistencia</span>
+                        </div>
+
+                        <label>Seleccionar Paciente</label>
+                        <select id="clinicalPatientSelect">
+                            <option value="">Cargando pacientes...</option>
+                        </select>
+
+                        <label>Staff Médico Solicitante</label>
+                        <select id="clinicalStaffSelect">
+                            <option value="">Cargando personal médico...</option>
+                        </select>
+
+                        <label>Síntomas, Exploración y Hallazgos Clínicos</label>
+                        <textarea id="clinicalNotes" style="height: 120px;" placeholder="Detalle los síntomas actuales, signos vitales, antecedentes relevantes y dudas diagnósticas..."></textarea>
+
+                        <div class="grid-2">
+                            <div>
+                                <label>Fármacos Sintéticos Propuestos</label>
+                                <input type="text" id="synthDrugs" placeholder="Ej: Warfarina, Metformina">
+                            </div>
+                            <div>
+                                <label>Fitoterapia / Remedios Naturales</label>
+                                <input type="text" id="naturalRemedies" placeholder="Ej: Ginkgo biloba, Valeriana">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-block" onclick="triggerAIConsultation()"><i class="fa-solid fa-wand-magic-sparkles"></i> Analizar Caso con IA y Evidencia RAG</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa-solid fa-microchip"></i> Reporte Generado por IA y Citas RAG</div>
+                            <span id="ragStatusBadge" class="tag tag-amber">En Espera</span>
+                        </div>
+
+                        <div id="aiResponseContainer" style="max-height: 480px; overflow-y: auto; padding-right: 5px;">
+                            <p style="color: var(--text-muted); text-align: center; margin-top: 80px;">
+                                Ingrese las notas clínicas y presione el botón para generar el informe diagnóstico RAG y validación cruzada.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PANEL DE GOBERNANZA Y FIRMA HUMANA -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa-solid fa-signature"></i> Gobernanza Médica Humana (Human-in-the-Loop Obligatorio)</div>
+                        <span class="tag tag-emerald">Fase 2: Resolución Legal</span>
+                    </div>
+
+                    <div class="grid-2">
+                        <div>
+                            <label>Resolución Clínica del Médico</label>
+                            <select id="resolutionStatus">
+                                <option value="ACCEPTED_FULL">Aceptación Completa de la Recomendación IA</option>
+                                <option value="ACCEPTED_PARTIAL">Aceptación Parcial con Ajuste Terapéutico</option>
+                                <option value="REJECTED">Rechazo de la Recomendación IA (Discrepancia Clínica)</option>
+                                <option value="ADDITIONAL_TESTS_REQUESTED">Solicitud de Pruebas Adicionales Previas</option>
+                            </select>
+
+                            <label>Diagnóstico Definitivo Establecido</label>
+                            <input type="text" id="finalDiagnosis" placeholder="Ej: Fibrilación auricular no valvular + Diabetes Tipo 2">
+
+                            <label>Plan Terapéutico y Curativo Validado</label>
+                            <textarea id="finalTreatment" style="height: 75px;" placeholder="Prescripción final, dosificación, interconsultas y seguimiento..."></textarea>
+                        </div>
+
+                        <div>
+                            <label>Justificación Clínica Médica</label>
+                            <textarea id="clinicalJustification" style="height: 75px;" placeholder="Fundamento de la decisión clínica profesional..."></textarea>
+
+                            <label>Firma Criptográfica / Passphrase del Médico</label>
+                            <input type="password" id="staffPassphrase" placeholder="Contraseña de firma digital médica">
+
+                            <button class="btn btn-emerald btn-block" onclick="submitHumanDecision()"><i class="fa-solid fa-lock"></i> Firmar y Asentar Decisión en Ledger Inmutable</button>
+                            <div id="decisionResult" style="margin-top: 10px; font-size: 0.85rem;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. EXPEDIENTES Y PACIENTES -->
+            <div id="patients-records" class="view-panel">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa-solid fa-user-plus"></i> Registrar Nuevo Paciente en Expediente</div>
+                        </div>
+                        <label>Número de Expediente (MRN)</label>
+                        <input type="text" id="pMrn" placeholder="Ej: EXP-2026-0105">
+
+                        <label>Nombre Completo del Paciente</label>
+                        <input type="text" id="pName" placeholder="Ej: Carlos Alberto Morales">
+
+                        <div class="grid-2">
+                            <div>
+                                <label>Fecha de Nacimiento</label>
+                                <input type="date" id="pDob">
+                            </div>
+                            <div>
+                                <label>Tipo de Sangre</label>
+                                <select id="pBlood">
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <label>Alergias Conocidas (Separadas por comas)</label>
+                        <input type="text" id="pAllergies" placeholder="Ej: Penicilina, AINEs, Mariscos">
+
+                        <label>Medicaciones Actuales (Separadas por comas)</label>
+                        <input type="text" id="pMeds" placeholder="Ej: Losartán 50mg, Omeprazol 20mg">
+
+                        <button class="btn btn-emerald btn-block" onclick="createPatient()"><i class="fa-solid fa-save"></i> Guardar Expediente</button>
+                        <div id="patientCreateMsg" style="margin-top: 10px;"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa-solid fa-users"></i> Directorio de Pacientes Activos</div>
+                            <button class="btn" style="padding: 4px 10px; font-size: 0.75rem;" onclick="loadPatients()"><i class="fa-solid fa-rotate"></i> Actualizar</button>
+                        </div>
+                        <div style="max-height: 480px; overflow-y: auto;">
+                            <table class="data-table" id="patientsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Expediente</th>
+                                        <th>Nombre</th>
+                                        <th>Sangre</th>
+                                        <th>Alergias</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="4" style="text-align: center;">Cargando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. IOMT & LABORATORIO CLÍNICO -->
+            <div id="iomt-lab" class="view-panel">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa-solid fa-microscope"></i> Ingesta Telemétrica IoMT (HL7/DICOM Gateway)</div>
+                            <span class="tag tag-cyan">Simulador MLLP</span>
+                        </div>
+                        <label>Seleccionar Equipo Conectado</label>
+                        <select id="equipmentSelect">
+                            <option value="">Cargando analizadores...</option>
+                        </select>
+
+                        <label>Paciente Destino</label>
+                        <select id="iomtPatientSelect">
+                            <option value="">Cargando pacientes...</option>
+                        </select>
+
+                        <label>Tipo de Prueba Analítica</label>
+                        <input type="text" id="iomtTestName" placeholder="Ej: Glucemia en Ayunas / Perfil Lipídico">
+
+                        <div class="grid-2">
+                            <div>
+                                <label>Valor Medido</label>
+                                <input type="number" step="0.01" id="iomtValue" placeholder="Ej: 142.5">
+                            </div>
+                            <div>
+                                <label>Unidad de Medida</label>
+                                <input type="text" id="iomtUnit" placeholder="Ej: mg/dL">
+                            </div>
+                        </div>
+
+                        <label>Rango de Referencia Normal</label>
+                        <input type="text" id="iomtRefRange" placeholder="Ej: 70.0 - 100.0">
+
+                        <button class="btn btn-block" onclick="simulateIoMTTelemetry()"><i class="fa-solid fa-network-wired"></i> Emitir Trama HL7 & Guardar Telemetría</button>
+                        <div id="iomtMsg" style="margin-top: 10px;"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa-solid fa-vial"></i> Resultados Recientes de Laboratorio e IoMT</div>
+                            <button class="btn" style="padding: 4px 10px; font-size: 0.75rem;" onclick="loadRecentLabs()"><i class="fa-solid fa-rotate"></i> Actualizar</button>
+                        </div>
+                        <div style="max-height: 480px; overflow-y: auto;">
+                            <table class="data-table" id="labsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha / Hora</th>
+                                        <th>Prueba</th>
+                                        <th>Resultado</th>
+                                        <th>Alerta Flag</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="4" style="text-align: center;">Cargando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. BIBLIOTECA RAG VECTORIAL -->
+            <div id="rag-library" class="view-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa-solid fa-magnifying-glass"></i> Búsqueda Semántica Vectorial en Tratados Médicos</div>
+                        <span class="tag tag-blue">pgvector Cosine Distance</span>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="ragSearchQuery" style="margin-bottom:0;" placeholder="Buscar en la base de medicina interna, farmacología o botánica clínica (ej: dosificación de warfarina, interacción hipérico)...">
+                        <button class="btn" style="white-space: nowrap; width: 180px;" onclick="searchRAGLiterature()"><i class="fa-solid fa-search"></i> Búsqueda RAG</button>
+                    </div>
+                    <div id="ragSearchResults" style="margin-top: 20px;"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa-solid fa-book-bookmark"></i> Tratados y Chunks Indexados en Base Vectorial</div>
+                        <button class="btn" style="padding: 4px 10px; font-size: 0.75rem;" onclick="loadLiterature()"><i class="fa-solid fa-rotate"></i> Recargar</button>
+                    </div>
+                    <div style="max-height: 380px; overflow-y: auto;">
+                        <table class="data-table" id="literatureTable">
+                            <thead>
+                                <tr>
+                                    <th>Tratado / Libro</th>
+                                    <th>Especialidad</th>
+                                    <th>Sección / Capítulo</th>
+                                    <th>Resumen del Chunk</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="4" style="text-align: center;">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. VADEMÉCUM & FITOTERAPIA -->
+            <div id="pharmacology-botany" class="view-panel">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa-solid fa-shield-virus"></i> Matriz de Interacciones Fármaco-Planta</div>
+                            <button class="btn" style="padding: 4px 10px; font-size: 0.75rem;" onclick="loadInteractions()"><i class="fa-solid fa-rotate"></i> Actualizar</button>
+                        </div>
+                        <div style="max-height: 480px; overflow-y: auto;">
+                            <table class="data-table" id="interactionsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Fármaco</th>
+                                        <th>Remedio Natural</th>
+                                        <th>Severidad</th>
+                                        <th>Mecanismo y Recomendación</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="4" style="text-align: center;">Cargando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa-solid fa-plus-circle"></i> Registrar Nueva Interacción en Matriz</div>
+                        </div>
+                        <label>Nombre del Fármaco Sintético</label>
+                        <input type="text" id="interDrug" placeholder="Ej: Digoxina">
+
+                        <label>Nombre de la Planta / Compuesto Natural</label>
+                        <input type="text" id="interPlant" placeholder="Ej: Regaliz (Glycyrrhiza glabra)">
+
+                        <label>Nivel de Severidad de la Interacción</label>
+                        <select id="interSeverity">
+                            <option value="CRITICAL">Crítica (Contraindicación Absoluta / Riesgo Vital)</option>
+                            <option value="MAJOR">Mayor (Monitoreo Riguroso Obligatorio)</option>
+                            <option value="MODERATE">Moderada (Posible Alteración de Concentración)</option>
+                            <option value="MINOR">Menor (Efecto Clínico Leve)</option>
+                        </select>
+
+                        <label>Mecanismo Clínico de Acción</label>
+                        <textarea id="interMech" style="height: 65px;" placeholder="Mecanismo farmacocinético o farmacodinámico..."></textarea>
+
+                        <label>Recomendación Clínica para el Médico</label>
+                        <textarea id="interRec" style="height: 65px;" placeholder="Acción sugerida al prescribir..."></textarea>
+
+                        <button class="btn btn-emerald btn-block" onclick="createInteraction()"><i class="fa-solid fa-save"></i> Asentar Interacción</button>
+                        <div id="interMsg" style="margin-top: 10px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. CONSOLA DE IA & MODELOS -->
+            <div id="ai-governance" class="view-panel">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa-solid fa-robot"></i> Motor de Inferencia LLM Activo</div>
+                            <span id="aiStatusTag" class="tag tag-emerald">ONLINE</span>
+                        </div>
+                        <div style="margin-bottom: 15px; font-size: 0.9rem; line-height: 1.8;">
+                            <div><strong>Modelo en Ejecución:</strong> <span id="currentLlmModel" style="color: var(--accent-cyan);">phi4-mini:latest</span></div>
+                            <div><strong>Endpoint de Inferencia:</strong> <span id="currentLlmEndpoint" style="color: var(--text-secondary);">http://localhost:11434/api/chat</span></div>
+                            <div><strong>Modelo Vectorial:</strong> <span style="color: var(--accent-emerald);">paraphrase-multilingual-mpnet-base-v2 (768d)</span></div>
+                        </div>
+
+                        <label>Cambiar Modelo Activo</label>
+                        <select id="modelSelector">
+                            <option value="phi4-mini:latest">phi4-mini:latest (3.8B - Alta precisión médica)</option>
+                            <option value="llama3.2:latest">llama3.2:latest (3.2B - Respuesta ultrarrápida)</option>
+                            <option value="qwen2.5:latest">qwen2.5:latest (7B - Razonamiento extendido)</option>
+                        </select>
+
+                        <label>Temperatura de Inferencia (Determinismo Clínico)</label>
+                        <input type="range" id="tempRange" min="0.0" max="0.5" step="0.05" value="0.1" oninput="document.getElementById('tempVal').innerText = this.value">
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Valor actual: <strong id="tempVal" style="color: #fff;">0.1</strong> (Recomendado &lt; 0.2 para evitar alucinaciones)</div>
+
+                        <button class="btn btn-block" onclick="configureAIModel()"><i class="fa-solid fa-wrench"></i> Aplicar Parámetros de Inferencia</button>
+                        <div id="aiConfigMsg" style="margin-top: 10px;"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa-solid fa-scale-balanced"></i> Barandales de Seguridad Clínica (Guardrails)</div>
+                            <span class="tag tag-emerald">Activo & Enforcing</span>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 15px;">
+                            Asclepio CDSS implementa guardrails algorítmicos estrictos para garantizar el cumplimiento normativo médico:
+                        </p>
+                        <ul style="font-size: 0.85rem; line-height: 1.8; padding-left: 20px; color: #cbd5e1;">
+                            <li><strong>Regla #1:</strong> Prohibición de prescripción autónoma. Toda orden médica debe ser aprobada y firmada con token criptográfico por un profesional colegiado.</li>
+                            <li><strong>Regla #2:</strong> Inclusión obligatoria del disclaimer médico institucional en todas las respuestas generadas por IA.</li>
+                            <li><strong>Regla #3:</strong> Verificación cruzada automática con la base vectorial de tratados y vademécum antes de emitir sugerencias.</li>
+                            <li><strong>Regla #4:</strong> Bloqueo preventivo de interacciones letales de fármacos o fitoterapia antes de la revisión médica.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. AUDITORÍA & TRAZABILIDAD (LEDGER INMUTABLE) -->
+            <div id="audit-ledger" class="view-panel">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa-solid fa-receipt"></i> Registro de Decisiones Clínicas Auditadas y Firmadas</div>
+                        <button class="btn" style="padding: 4px 10px; font-size: 0.75rem;" onclick="loadAuditDecisions()"><i class="fa-solid fa-rotate"></i> Actualizar Ledger</button>
+                    </div>
+                    <div style="max-height: 520px; overflow-y: auto;">
+                        <table class="data-table" id="auditTable">
+                            <thead>
+                                <tr>
+                                    <th>Fecha / Hora (UTC)</th>
+                                    <th>Paciente</th>
+                                    <th>Médico Decisor</th>
+                                    <th>Resolución</th>
+                                    <th>Diagnóstico Definitivo</th>
+                                    <th>Firma Hash SHA-256</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="6" style="text-align: center;">Cargando ledger de auditoría...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. MÉTRICAS & CONFIGURACIÓN DEL SISTEMA -->
+            <div id="system-metrics" class="view-panel">
+                <div class="grid-4" style="margin-bottom: 20px;">
+                    <div class="stat-box">
+                        <div class="stat-icon" style="color: var(--accent-blue);"><i class="fa-solid fa-hospital-user"></i></div>
+                        <div>
+                            <div class="stat-value" id="statPatients">-</div>
+                            <div class="stat-label">Pacientes en Sistema</div>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon" style="color: var(--accent-cyan);"><i class="fa-solid fa-user-nurse"></i></div>
+                        <div>
+                            <div class="stat-value" id="statStaff">-</div>
+                            <div class="stat-label">Personal Clínico</div>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon" style="color: var(--accent-emerald);"><i class="fa-solid fa-layer-group"></i></div>
+                        <div>
+                            <div class="stat-value" id="statChunks">-</div>
+                            <div class="stat-label">Chunks RAG Indexados</div>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon" style="color: var(--accent-amber);"><i class="fa-solid fa-signature"></i></div>
+                        <div>
+                            <div class="stat-value" id="statDecisions">-</div>
+                            <div class="stat-label">Decisiones Validadas</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa-solid fa-server"></i> Estado de la Infraestructura Hospitalaria</div>
+                        </div>
+                        <table class="data-table">
+                            <tr><td><strong>Servidor API Backend:</strong></td><td><span class="tag tag-emerald">FastAPI 0.115 / Uvicorn</span></td></tr>
+                            <tr><td><strong>Base de Datos Relacional y Vectorial:</strong></td><td><span class="tag tag-emerald">PostgreSQL 16 + pgvector</span></td></tr>
+                            <tr><td><strong>Modelo de Embeddings Multilingüe:</strong></td><td><span class="tag tag-blue">paraphrase-multilingual-mpnet-base-v2</span></td></tr>
+                            <tr><td><strong>Motor de Inteligencia Artificial Local:</strong></td><td><span class="tag tag-emerald">Ollama Local Engine</span></td></tr>
+                            <tr><td><strong>Seguridad y Análisis Estático:</strong></td><td><span class="tag tag-emerald">Bandit 0 ISSUES / Ruff Clean</span></td></tr>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa-solid fa-circle-info"></i> Información Legal y Licenciamiento</div>
+                        </div>
+                        <p style="font-size: 0.85rem; line-height: 1.6; color: var(--text-secondary); margin-bottom: 12px;">
+                            <strong>Asclepio CDSS</strong> opera bajo los términos de la <em>Business Source License 1.1 (BUSL-1.1)</em>.
+                        </p>
+                        <div class="disclaimer-box">
+                            <strong>Aviso Importante:</strong> Esta plataforma es una herramienta de soporte computacional a la toma de decisiones clínicas y no reemplaza el juicio clínico, diagnóstico o prescripción de un profesional médico matriculado.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
 
     <script>
         let currentConsultationId = null;
 
+        // CAMBIO DE VISTAS EN EL SIDEBAR
+        function switchView(viewId) {
+            document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+
+            const targetPanel = document.getElementById(viewId);
+            if (targetPanel) targetPanel.classList.add('active');
+
+            // Resaltar item del menú
+            const items = document.querySelectorAll('.nav-item');
+            items.forEach(item => {
+                if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(viewId)) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Actualizar título de barra superior
+            const titles = {
+                'clinical-station': 'Estación Clínica & Triaje Asistido',
+                'patients-records': 'Expedientes & Directorio de Pacientes',
+                'iomt-lab': 'Gateway IoMT & Laboratorio Clínico',
+                'rag-library': 'Biblioteca RAG & Tratados Médicos',
+                'pharmacology-botany': 'Vademécum & Matriz de Fitoterapia',
+                'ai-governance': 'Consola de IA, Modelos & Guardrails',
+                'audit-ledger': 'Ledger Inmutable de Auditoría & Trazabilidad',
+                'system-metrics': 'Métricas del Sistema & Configuración'
+            };
+            document.getElementById('currentViewTitle').innerText = titles[viewId] || 'Asclepio CDSS';
+
+            // Cargar datos correspondientes
+            if (viewId === 'patients-records') loadPatients();
+            if (viewId === 'iomt-lab') { loadEquipment(); loadRecentLabs(); }
+            if (viewId === 'rag-library') loadLiterature();
+            if (viewId === 'pharmacology-botany') loadInteractions();
+            if (viewId === 'ai-governance') loadAIStatus();
+            if (viewId === 'audit-ledger') loadAuditDecisions();
+            if (viewId === 'system-metrics') loadMetrics();
+        }
+
+        // CARGA INICIAL
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadPatientsDropdown();
+            await loadStaffDropdown();
+            await loadMetrics();
+        });
+
+        // ==========================================
+        // 1. ESTACIÓN CLÍNICA
+        // ==========================================
+        async function loadPatientsDropdown() {
+            try {
+                const res = await fetch('/api/v1/patients');
+                if (res.ok) {
+                    const patients = await res.json();
+                    const selects = [document.getElementById('clinicalPatientSelect'), document.getElementById('iomtPatientSelect')];
+                    selects.forEach(select => {
+                        if (!select) return;
+                        select.innerHTML = '<option value="">Seleccione un paciente...</option>';
+                        patients.forEach(p => {
+                            select.innerHTML += `<option value="${p.patient_id}">${p.medical_record_number} - ${p.full_name}</option>`;
+                        });
+                    });
+                }
+            } catch (e) { console.error("Error al cargar pacientes:", e); }
+        }
+
+        async function loadStaffDropdown() {
+            try {
+                const res = await fetch('/api/v1/staff');
+                if (res.ok) {
+                    const staffList = await res.json();
+                    const select = document.getElementById('clinicalStaffSelect');
+                    if (select) {
+                        select.innerHTML = '<option value="">Seleccione un facultativo...</option>';
+                        staffList.forEach(s => {
+                            select.innerHTML += `<option value="${s.staff_id}">${s.full_name} (${s.specialty})</option>`;
+                        });
+                    }
+                }
+            } catch (e) { console.error("Error al cargar personal:", e); }
+        }
+
         async function triggerAIConsultation() {
-            const patientId = document.getElementById('patientId').value.trim();
-            const staffId = document.getElementById('staffId').value.trim();
+            const patientId = document.getElementById('clinicalPatientSelect').value;
+            const staffId = document.getElementById('clinicalStaffSelect').value;
             const notes = document.getElementById('clinicalNotes').value.trim();
-            const synth = document.getElementById('synthDrugs').value.split(',').map(s => s.trim()).filter(Boolean);
-            const natural = document.getElementById('naturalRemedies').value.split(',').map(s => s.trim()).filter(Boolean);
+            const synth = document.getElementById('synthDrugs').value.trim();
+            const natural = document.getElementById('naturalRemedies').value.trim();
 
             if (!patientId || !staffId || !notes) {
-                alert("Por favor complete los campos obligatorios de Paciente, Profesional y Notas Clínicas.");
+                alert("Por favor seleccione Paciente, Facultativo y redacte las notas clínicas.");
                 return;
             }
 
-            document.getElementById('aiResponseContainer').innerHTML = "<p style='color: var(--accent-blue); text-align:center;'>Procesando búsqueda semántica pgvector, cruzando máquinas HL7 y consultando modelo IA...</p>";
+            document.getElementById('ragStatusBadge').className = 'tag tag-blue';
+            document.getElementById('ragStatusBadge').innerText = 'Procesando RAG...';
+            document.getElementById('aiResponseContainer').innerHTML = "<p style='color: var(--accent-cyan); text-align:center; padding: 40px;'>Consultando pgvector, cruzando telemetría y solicitando análisis a la IA local...</p>";
 
             try {
                 const response = await fetch('/api/v1/consultations/analyze', {
@@ -151,17 +929,21 @@
 
                 const data = await response.json();
                 currentConsultationId = data.consultation_id;
+                document.getElementById('ragStatusBadge').className = 'tag tag-emerald';
+                document.getElementById('ragStatusBadge').innerText = 'Completado';
                 renderAIReport(data.ai_assistance_report);
 
             } catch (error) {
-                document.getElementById('aiResponseContainer').innerHTML = `<p style="color: var(--accent-red);">Error: ${error.message}</p>`;
+                document.getElementById('ragStatusBadge').className = 'tag tag-rose';
+                document.getElementById('ragStatusBadge').innerText = 'Error';
+                document.getElementById('aiResponseContainer').innerHTML = `<p style="color: var(--accent-rose);">Error: ${error.message}</p>`;
             }
         }
 
         function renderAIReport(report) {
-            let html = `<p><strong>Síntesis Clínica:</strong> ${report.clinical_summary}</p><br>`;
-            
-            html += `<strong>Diagnósticos Diferenciales Sugeridos:</strong><ul>`;
+            let html = `<p style="line-height:1.6;"><strong>Síntesis Clínica:</strong> ${report.clinical_summary}</p><br>`;
+
+            html += `<strong>Diagnósticos Diferenciales Sugeridos:</strong><ul style="padding-left:20px; margin: 10px 0; line-height: 1.6;">`;
             report.differential_diagnoses.forEach(d => {
                 html += `<li><strong>${d.pathology_name}</strong> (${d.probability_level}): ${d.reasoning}</li>`;
             });
@@ -170,7 +952,7 @@
             html += `<strong>Evidencia Bibliográfica Citada (RAG):</strong>`;
             report.cited_literature.forEach(c => {
                 html += `<div class="citation-item">
-                    📖 <strong>${c.book_title}</strong> [Rama: ${c.branch}]<br>
+                    📖 <strong>${c.book_title}</strong> [${c.branch}]<br>
                     📍 Ref: ${c.page_and_section}<br>
                     💬 ${c.clinical_relevance}
                 </div>`;
@@ -184,43 +966,385 @@
                 html += `</div>`;
             }
 
-            html += `<div class="disclaimer">${report.human_governance_disclaimer}</div>`;
+            html += `<div class="disclaimer-box">${report.human_governance_disclaimer}</div>`;
             document.getElementById('aiResponseContainer').innerHTML = html;
         }
 
         async function submitHumanDecision() {
             if (!currentConsultationId) {
-                alert("Debe generar y revisar una consulta de asistencia IA antes de firmar.");
+                alert("Debe generar y evaluar una consulta de IA antes de emitir la resolución final.");
                 return;
             }
 
-            const payload = {
-                consultation_id: currentConsultationId,
-                patient_id: document.getElementById('patientId').value.trim(),
-                deciding_staff_id: document.getElementById('staffId').value.trim(),
-                resolution_status: document.getElementById('resolutionStatus').value,
-                final_clinical_diagnosis: document.getElementById('finalDiagnosis').value.trim(),
-                final_treatment_and_curation_plan: document.getElementById('finalTreatment').value.trim(),
-                clinical_justification: document.getElementById('clinicalJustification').value.trim(),
-                staff_passphrase_or_token: document.getElementById('staffPassphrase').value.trim()
-            };
+            const patientId = document.getElementById('clinicalPatientSelect').value;
+            const staffId = document.getElementById('clinicalStaffSelect').value;
+            const resStatus = document.getElementById('resolutionStatus').value;
+            const diag = document.getElementById('finalDiagnosis').value.trim();
+            const plan = document.getElementById('finalTreatment').value.trim();
+            const just = document.getElementById('clinicalJustification').value.trim();
+            const pass = document.getElementById('staffPassphrase').value.trim();
+
+            if (!diag || !plan || !just || !pass) {
+                alert("Por favor complete todos los campos de resolución médica y su contraseña de firma.");
+                return;
+            }
 
             try {
                 const response = await fetch('/api/v1/decisions/validate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        consultation_id: currentConsultationId,
+                        patient_id: patientId,
+                        deciding_staff_id: staffId,
+                        resolution_status: resStatus,
+                        final_clinical_diagnosis: diag,
+                        final_treatment_and_curation_plan: plan,
+                        clinical_justification: just,
+                        staff_passphrase_or_token: pass
+                    })
                 });
 
                 const data = await response.json();
-                if (!response.ok) throw new Error(data.detail || "Error al registrar la decisión.");
+                if (!response.ok) throw new Error(data.detail || "Error al validar la decisión.");
 
                 document.getElementById('decisionResult').innerHTML = 
-                    `<span style="color: var(--accent-emerald);">✔ Éxito: Decisión firmada e inmutada (ID: ${data.decision_id})</span>`;
+                    `<div style="color: var(--accent-emerald); font-weight:600;"><i class="fa-solid fa-check"></i> Decisión firmada e inmutada (ID: ${data.decision_id})</div>`;
+                loadMetrics();
             } catch (error) {
                 document.getElementById('decisionResult').innerHTML = 
-                    `<span style="color: var(--accent-red);">✖ Error: ${error.message}</span>`;
+                    `<div style="color: var(--accent-rose); font-weight:600;"><i class="fa-solid fa-circle-xmark"></i> Error: ${error.message}</div>`;
             }
+        }
+
+        // ==========================================
+        // 2. PACIENTES
+        // ==========================================
+        async function loadPatients() {
+            try {
+                const res = await fetch('/api/v1/patients');
+                const data = await res.json();
+                const tbody = document.querySelector('#patientsTable tbody');
+                tbody.innerHTML = '';
+                data.forEach(p => {
+                    const allergies = (p.known_allergies || []).join(', ') || 'Ninguna';
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${p.medical_record_number}</strong></td>
+                            <td>${p.full_name}</td>
+                            <td><span class="tag tag-emerald">${p.blood_type || 'N/D'}</span></td>
+                            <td>${allergies}</td>
+                        </tr>
+                    `;
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        async function createPatient() {
+            const mrn = document.getElementById('pMrn').value.trim();
+            const name = document.getElementById('pName').value.trim();
+            const dob = document.getElementById('pDob').value;
+            const blood = document.getElementById('pBlood').value;
+            const allergies = document.getElementById('pAllergies').value.split(',').map(s=>s.trim()).filter(Boolean);
+            const meds = document.getElementById('pMeds').value.split(',').map(s=>s.trim()).filter(Boolean);
+
+            if (!mrn || !name || !dob) {
+                alert("Complete número de expediente, nombre y fecha de nacimiento.");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/v1/patients', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        medical_record_number: mrn,
+                        full_name: name,
+                        birth_date: dob,
+                        blood_type: blood,
+                        known_allergies: allergies,
+                        current_medications: meds
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || "Error al crear");
+                document.getElementById('patientCreateMsg').innerHTML = `<span style="color:var(--accent-emerald);">✔ Expediente creado exitosamente</span>`;
+                loadPatients();
+                loadPatientsDropdown();
+                loadMetrics();
+            } catch(e) {
+                document.getElementById('patientCreateMsg').innerHTML = `<span style="color:var(--accent-rose);">✖ Error: ${e.message}</span>`;
+            }
+        }
+
+        // ==========================================
+        // 3. IOMT & LABORATORIO
+        // ==========================================
+        async function loadEquipment() {
+            try {
+                const res = await fetch('/api/v1/equipment');
+                const data = await res.json();
+                const sel = document.getElementById('equipmentSelect');
+                sel.innerHTML = '<option value="">Seleccione equipo analizador...</option>';
+                data.forEach(eq => {
+                    sel.innerHTML += `<option value="${eq.equipment_id}">${eq.equipment_name} (${eq.protocol}) - ${eq.department}</option>`;
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        async function loadRecentLabs() {
+            try {
+                const res = await fetch('/api/v1/laboratory/recent');
+                const data = await res.json();
+                const tbody = document.querySelector('#labsTable tbody');
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Sin telemetría reciente</td></tr>';
+                    return;
+                }
+                data.forEach(l => {
+                    const flagTag = l.is_abnormal ? '<span class="tag tag-rose">ANORMAL</span>' : '<span class="tag tag-emerald">NORMAL</span>';
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${new Date(l.observation_datetime).toLocaleString()}</td>
+                            <td>${l.test_name}</td>
+                            <td><strong>${l.numeric_value}</strong> ${l.unit}</td>
+                            <td>${flagTag}</td>
+                        </tr>
+                    `;
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        async function simulateIoMTTelemetry() {
+            const patientId = document.getElementById('iomtPatientSelect').value;
+            const eqId = document.getElementById('equipmentSelect').value;
+            const testName = document.getElementById('iomtTestName').value.trim();
+            const val = parseFloat(document.getElementById('iomtValue').value);
+            const unit = document.getElementById('iomtUnit').value.trim();
+            const refRange = document.getElementById('iomtRefRange').value.trim();
+
+            if (!patientId || !eqId || !testName || isNaN(val)) {
+                alert("Complete los datos requeridos para la emisión telemétrica.");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/v1/laboratory/telemetry', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        patient_id: patientId,
+                        equipment_id: eqId,
+                        test_name: testName,
+                        numeric_value: val,
+                        unit: unit,
+                        reference_range: refRange,
+                        is_abnormal: val > 120 || val < 60
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || "Error al emitir telemetría");
+                document.getElementById('iomtMsg').innerHTML = `<span style="color:var(--accent-emerald);">✔ Trama HL7 procesada correctamente</span>`;
+                loadRecentLabs();
+            } catch(e) {
+                document.getElementById('iomtMsg').innerHTML = `<span style="color:var(--accent-rose);">✖ Error: ${e.message}</span>`;
+            }
+        }
+
+        // ==========================================
+        // 4. BIBLIOTECA RAG
+        // ==========================================
+        async function loadLiterature() {
+            try {
+                const res = await fetch('/api/v1/literature');
+                const data = await res.json();
+                const tbody = document.querySelector('#literatureTable tbody');
+                tbody.innerHTML = '';
+                data.forEach(item => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${item.book_title}</strong></td>
+                            <td><span class="tag tag-cyan">${item.branch}</span></td>
+                            <td>${item.chapter_or_section || 'N/A'}</td>
+                            <td>${item.content_chunk.substring(0, 110)}...</td>
+                        </tr>
+                    `;
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        async function searchRAGLiterature() {
+            const query = document.getElementById('ragSearchQuery').value.trim();
+            if (!query) return;
+            const container = document.getElementById('ragSearchResults');
+            container.innerHTML = "<p style='color: var(--accent-cyan);'>Buscando vectores similares en pgvector...</p>";
+
+            try {
+                const res = await fetch(`/api/v1/literature/search?query=${encodeURIComponent(query)}&limit=4`);
+                const data = await res.json();
+                container.innerHTML = '';
+                if (data.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-muted);">No se encontraron fragmentos relevantes con la distancia configurada.</p>';
+                    return;
+                }
+                data.forEach(chunk => {
+                    container.innerHTML += `
+                        <div class="citation-item">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <strong>📖 ${chunk.book_title} (${chunk.branch})</strong>
+                                <span class="tag tag-blue">Similitud Cosine</span>
+                            </div>
+                            <p style="color: #cbd5e1; margin-bottom: 5px;">${chunk.content_chunk}</p>
+                            <small style="color: var(--text-muted);">Sección: ${chunk.chapter_or_section || 'General'}</small>
+                        </div>
+                    `;
+                });
+            } catch(e) {
+                container.innerHTML = `<p style="color: var(--accent-rose);">Error: ${e.message}</p>`;
+            }
+        }
+
+        // ==========================================
+        // 5. INTERACCIONES
+        // ==========================================
+        async function loadInteractions() {
+            try {
+                const res = await fetch('/api/v1/interactions');
+                const data = await res.json();
+                const tbody = document.querySelector('#interactionsTable tbody');
+                tbody.innerHTML = '';
+                data.forEach(i => {
+                    let tagClass = 'tag-amber';
+                    if (i.severity_level === 'CRITICAL') tagClass = 'tag-rose';
+                    if (i.severity_level === 'MINOR') tagClass = 'tag-emerald';
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${i.synthetic_drug}</strong></td>
+                            <td>${i.natural_remedy}</td>
+                            <td><span class="tag ${tagClass}">${i.severity_level}</span></td>
+                            <td>${i.clinical_mechanism}</td>
+                        </tr>
+                    `;
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        async function createInteraction() {
+            const drug = document.getElementById('interDrug').value.trim();
+            const plant = document.getElementById('interPlant').value.trim();
+            const sev = document.getElementById('interSeverity').value;
+            const mech = document.getElementById('interMech').value.trim();
+            const rec = document.getElementById('interRec').value.trim();
+
+            if (!drug || !plant || !mech) {
+                alert("Complete los datos requeridos para registrar la interacción.");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/v1/interactions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        synthetic_drug: drug,
+                        natural_remedy: plant,
+                        severity_level: sev,
+                        clinical_mechanism: mech,
+                        recommendation: rec
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || "Error al guardar");
+                document.getElementById('interMsg').innerHTML = `<span style="color:var(--accent-emerald);">✔ Interacción registrada en la matriz</span>`;
+                loadInteractions();
+            } catch(e) {
+                document.getElementById('interMsg').innerHTML = `<span style="color:var(--accent-rose);">✖ Error: ${e.message}</span>`;
+            }
+        }
+
+        // ==========================================
+        // 6. GOBERNANZA IA
+        // ==========================================
+        async function loadAIStatus() {
+            try {
+                const res = await fetch('/api/v1/ai/status');
+                const data = await res.json();
+                document.getElementById('currentLlmModel').innerText = data.active_model;
+                document.getElementById('currentLlmEndpoint').innerText = data.api_endpoint;
+                const statusTag = document.getElementById('aiStatusTag');
+                if (data.engine_reachable) {
+                    statusTag.className = 'tag tag-emerald';
+                    statusTag.innerText = 'ONLINE';
+                } else {
+                    statusTag.className = 'tag tag-amber';
+                    statusTag.innerText = 'HOST BRIDGE';
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        async function configureAIModel() {
+            const model = document.getElementById('modelSelector').value;
+            const temp = parseFloat(document.getElementById('tempRange').value);
+
+            try {
+                const res = await fetch('/api/v1/ai/configure', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model_name: model, temperature: temp })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || "Error al configurar");
+                document.getElementById('aiConfigMsg').innerHTML = `<span style="color:var(--accent-emerald);">✔ Configuración de IA actualizada a ${model}</span>`;
+                loadAIStatus();
+            } catch(e) {
+                document.getElementById('aiConfigMsg').innerHTML = `<span style="color:var(--accent-rose);">✖ Error: ${e.message}</span>`;
+            }
+        }
+
+        // ==========================================
+        // 7. AUDITORÍA
+        // ==========================================
+        async function loadAuditDecisions() {
+            try {
+                const res = await fetch('/api/v1/audit/decisions');
+                const data = await res.json();
+                const tbody = document.querySelector('#auditTable tbody');
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay decisiones registradas aún</td></tr>';
+                    return;
+                }
+                data.forEach(d => {
+                    const shortHash = d.audit_log_hash ? d.audit_log_hash.substring(0, 16) + '...' : 'SIN HASH';
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${new Date(d.decision_timestamp).toLocaleString()}</td>
+                            <td>${d.patient_name || d.patient_id.substring(0,8)}</td>
+                            <td>${d.staff_name || d.deciding_staff_id.substring(0,8)}</td>
+                            <td><span class="tag tag-emerald">${d.resolution_status}</span></td>
+                            <td>${d.final_clinical_diagnosis}</td>
+                            <td><code style="color:var(--accent-cyan); font-size:0.75rem;">${shortHash}</code></td>
+                        </tr>
+                    `;
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        // ==========================================
+        // 8. MÉTRICAS DEL SISTEMA
+        // ==========================================
+        async function loadMetrics() {
+            try {
+                const res = await fetch('/api/v1/system/metrics');
+                if (res.ok) {
+                    const m = await res.json();
+                    document.getElementById('statPatients').innerText = m.total_patients || '0';
+                    document.getElementById('statStaff').innerText = m.total_staff || '0';
+                    document.getElementById('statChunks').innerText = m.total_chunks || '0';
+                    document.getElementById('statDecisions').innerText = m.total_decisions || '0';
+                }
+            } catch(e) { console.error("Error al cargar métricas:", e); }
         }
     </script>
 </body>

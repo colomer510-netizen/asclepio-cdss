@@ -32,8 +32,8 @@ async def seed_database():
                 """,
                 "EXP-2026-0089", "María Elena Rostrán", "1978-05-14", "O+", 
                 ["Penicilina"], 
-                '["Warfarina", "Metformina"]'::jsonb, 
-                '["Ginkgo biloba"]'::jsonb, 
+                '["Warfarina", "Metformina"]', 
+                '["Ginkgo biloba"]', 
                 ["Hipertensión Arterial", "Diabetes Mellitus Tipo 2"]
             )
             print(f"[✔] Paciente de prueba registrado con ID: {patient_id}")
